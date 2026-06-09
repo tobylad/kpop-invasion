@@ -1,0 +1,1634 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ORBIT Admin — Data Model Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #2a2a38;
+    --accent: #c8a8ff;
+    --accent2: #ff6eb4;
+    --accent3: #5ef0c8;
+    --text: #e8e8f0;
+    --text-muted: #888899;
+    --text-dim: #55556a;
+    --tag-bg: #1e1e2e;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Syne', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 14px;
+    line-height: 1.7;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .wrap {
+    width: 100%;
+    padding: 24px 16px 80px;
+  }
+
+  /* PAGE HEADER */
+  .page-header {
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .page-header h1 {
+    font-family: var(--sans);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .page-header h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .page-header p {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .header-badges {
+    display: flex;
+    gap: 6px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid;
+  }
+
+  .badge-purple { color: var(--accent); border-color: rgba(200,168,255,0.3); background: rgba(200,168,255,0.07); }
+  .badge-pink   { color: var(--accent2); border-color: rgba(255,110,180,0.3); background: rgba(255,110,180,0.07); }
+  .badge-teal   { color: var(--accent3); border-color: rgba(94,240,200,0.3);  background: rgba(94,240,200,0.07); }
+
+  /* SECTIONS */
+  .section { margin-bottom: 52px; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+
+  .section h2 {
+    font-family: var(--sans);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 10px;
+  }
+
+  .section > p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  /* RELATIONS */
+  .relations {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .relation-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .relation-tag::before { content: '→ '; color: var(--accent3); }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 8px 14px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    letter-spacing: 0.05em;
+    min-height: 36px;
+  }
+
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+  }
+
+  .code-block pre {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.7;
+    padding: 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: pre;
+    word-break: normal;
+  }
+
+  /* standalone code block (relational map) */
+  .code-block-solo {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .code-block-solo pre {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.7;
+    padding: 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: pre;
+  }
+
+  /* SYNTAX */
+  .k   { color: #c792ea; }
+  .t   { color: var(--accent3); }
+  .s   { color: #c3e88d; }
+  .n   { color: #82aaff; }
+  .c   { color: var(--text-dim); font-style: italic; }
+  .p   { color: var(--text-muted); }
+  .key { color: var(--accent); }
+  .fn  { color: var(--accent2); }
+
+  /* FIELD TABLE — stacked on mobile */
+  .field-table { margin-top: 20px; width: 100%; }
+
+  .field-table thead { display: none; }
+
+  .field-table tbody,
+  .field-table tr,
+  .field-table td { display: block; width: 100%; }
+
+  .field-table tr {
+    border-bottom: 1px solid var(--border);
+    padding: 12px 0;
+  }
+
+  .field-table tr:last-child { border-bottom: none; }
+
+  .field-table td {
+    padding: 2px 0;
+    border: none;
+  }
+
+  .field-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 2px;
+  }
+
+  .field-name { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+  .field-type { font-family: var(--mono); font-size: 11px; color: var(--accent3); white-space: normal; }
+  .field-req  { font-family: var(--mono); font-size: 10px; color: var(--accent2); }
+  .field-opt  { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+  .field-desc { color: var(--text-muted); font-size: 13px; }
+
+  /* ALERT */
+  .alert {
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin: 20px 0;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 1px solid;
+  }
+
+  .alert-info { background: rgba(94,240,200,0.05); border-color: rgba(94,240,200,0.2); color: var(--accent3); }
+  .alert-warn { background: rgba(255,110,180,0.05); border-color: rgba(255,110,180,0.2); color: var(--accent2); }
+  .alert p { color: var(--text-muted); }
+  .alert p strong { color: var(--text); }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header" id="intro">
+    <div class="section-label">Data Model Reference</div>
+    <h1>ORBIT <em>Admin</em><br/>K-pop Management Platform</h1>
+    <p>
+      Complete data schema for the ORBIT admin system. Each entity below includes a TypeScript interface,
+      a sample JSON object, a field reference table, and its relational links to other entities.
+      This is a fully linked, relational model — data is designed to interact across domains.
+    </p>
+    <div class="header-badges">
+      <span class="badge badge-purple">TypeScript</span>
+      <span class="badge badge-pink">JSON</span>
+      <span class="badge badge-teal">Relational</span>
+    </div>
+  </div>
+
+  <!-- RELATIONAL MAP -->
+  <section class="section" id="relational-map">
+    <div class="section-label">Architecture</div>
+    <h2>Relational Map</h2>
+    <p>How the entities connect to each other at a high level. Every arrow represents a foreign key relationship or array of references.</p>
+    <div class="code-block-solo">
+      <pre>
+<span class="c">// Core hierarchy</span>
+<span class="t">Band</span>
+  <span class="p">├──</span> members[]       <span class="p">→</span> <span class="t">Member</span>
+  <span class="p">└──</span> releases[]      <span class="p">→</span> <span class="t">Release</span>
+
+<span class="t">Member</span>
+  <span class="p">├──</span> soloProfileId   <span class="p">→</span> <span class="t">SoloProfile</span>   <span class="c">(optional — only popular members)</span>
+  <span class="p">├──</span> contractId      <span class="p">→</span> <span class="t">Contract</span>
+  <span class="p">├──</span> healthRecords[] <span class="p">→</span> <span class="t">HealthRecord</span>
+  <span class="p">└──</span> endorsements[]  <span class="p">→</span> <span class="t">Endorsement</span>
+
+<span class="t">Release</span>  <span class="c">(albums, EPs, singles — group or solo)</span>
+  <span class="p">├──</span> memberId        <span class="p">→</span> <span class="t">Member</span>        <span class="c">(optional — solo releases only)</span>
+  <span class="p">├──</span> salesRecords[]  <span class="p">→</span> <span class="t">AlbumSales</span>
+  <span class="p">├──</span> chartEntries[]  <span class="p">→</span> <span class="t">ChartEntry</span>
+  <span class="p">└──</span> socialSnapshots[] <span class="p">→</span> <span class="t">SocialSnapshot</span>
+
+<span class="t">ScheduleEvent</span>
+  <span class="p">├──</span> bandId          <span class="p">→</span> <span class="t">Band</span>
+  <span class="p">├──</span> venueId         <span class="p">→</span> <span class="t">Venue</span>
+  <span class="p">├──</span> memberIds[]     <span class="p">→</span> <span class="t">Member</span>        <span class="c">(for solo/sub-unit events)</span>
+  <span class="p">├──</span> releaseId       <span class="p">→</span> <span class="t">Release</span>       <span class="c">(if event is a release showcase)</span>
+  <span class="p">└──</span> incidentIds[]   <span class="p">→</span> <span class="t">Incident</span>      <span class="c">(disruptions linked to this event)</span>
+
+<span class="t">Incident</span>
+  <span class="p">├──</span> memberId        <span class="p">→</span> <span class="t">Member</span>        <span class="c">(optional — personal incidents)</span>
+  <span class="p">├──</span> venueId         <span class="p">→</span> <span class="t">Venue</span>         <span class="c">(optional — venue incidents)</span>
+  <span class="p">└──</span> affectedEventIds[] <span class="p">→</span> <span class="t">ScheduleEvent</span>
+
+<span class="t">Venue</span>
+  <span class="p">└──</span> incidents[]     <span class="p">→</span> <span class="t">Incident</span>
+      </pre>
+    </div>
+  </section>
+
+  <hr />
+
+  <!-- ═══ BAND ═══ -->
+  <section class="section" id="band">
+    <div class="section-label">Core Entity</div>
+    <h2>Band</h2>
+    <p>The top-level entity. A user begins with one band — either a boy group or girl group — containing 6–9 members. All other entities descend from or relate to a band.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Member[]</span>
+      <span class="relation-tag">Release[]</span>
+      <span class="relation-tag">ScheduleEvent[]</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'band-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'band-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="band-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">BandGender</span> <span class="p">=</span> <span class="s">'boy_group'</span> <span class="p">|</span> <span class="s">'girl_group'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">Band</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>            <span class="t">string</span><span class="p">;</span>          <span class="c">// uuid</span>
+  <span class="key">name</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">koreanName</span><span class="p">:</span>    <span class="t">string</span><span class="p">;</span>
+  <span class="key">gender</span><span class="p">:</span>        <span class="t">BandGender</span><span class="p">;</span>
+  <span class="key">debutDate</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>          <span class="c">// ISO 8601</span>
+  <span class="key">agency</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>
+  <span class="key">fandomName</span><span class="p">:</span>    <span class="t">string</span><span class="p">;</span>
+  <span class="key">logoUrl</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">memberIds</span><span class="p">:</span>     <span class="t">string</span><span class="p">[];</span>         <span class="c">// 6–9 Member ids</span>
+  <span class="key">active</span><span class="p">:</span>        <span class="t">boolean</span><span class="p">;</span>
+  <span class="key">createdAt</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>
+  <span class="key">updatedAt</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="band-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>           <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+  <span class="key">"name"</span><span class="p">:</span>         <span class="s">"NOVA SEVEN"</span><span class="p">,</span>
+  <span class="key">"koreanName"</span><span class="p">:</span>   <span class="s">"노바 세븐"</span><span class="p">,</span>
+  <span class="key">"gender"</span><span class="p">:</span>       <span class="s">"boy_group"</span><span class="p">,</span>
+  <span class="key">"debutDate"</span><span class="p">:</span>    <span class="s">"2022-03-14"</span><span class="p">,</span>
+  <span class="key">"agency"</span><span class="p">:</span>       <span class="s">"Stellar Entertainment"</span><span class="p">,</span>
+  <span class="key">"fandomName"</span><span class="p">:</span>   <span class="s">"ORBIT"</span><span class="p">,</span>
+  <span class="key">"logoUrl"</span><span class="p">:</span>      <span class="s">"https://cdn.example.com/bands/nova-seven/logo.png"</span><span class="p">,</span>
+  <span class="key">"memberIds"</span><span class="p">:</span>    <span class="p">[</span><span class="s">"mem_01"</span><span class="p">,</span> <span class="s">"mem_02"</span><span class="p">,</span> <span class="s">"mem_03"</span><span class="p">,</span> <span class="s">"mem_04"</span><span class="p">,</span> <span class="s">"mem_05"</span><span class="p">,</span> <span class="s">"mem_06"</span><span class="p">,</span> <span class="s">"mem_07"</span><span class="p">]</span><span class="p">,</span>
+  <span class="key">"active"</span><span class="p">:</span>       <span class="n">true</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>    <span class="s">"2022-01-01T00:00:00Z"</span><span class="p">,</span>
+  <span class="key">"updatedAt"</span><span class="p">:</span>    <span class="s">"2026-05-01T09:00:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr><td class="field-name">id</td><td class="field-type">string</td><td class="field-req">required</td><td class="field-desc">Unique identifier (UUID)</td></tr>
+      <tr><td class="field-name">name</td><td class="field-type">string</td><td class="field-req">required</td><td class="field-desc">Stage name / group name in English</td></tr>
+      <tr><td class="field-name">koreanName</td><td class="field-type">string</td><td class="field-req">required</td><td class="field-desc">Official Korean name (Hangul)</td></tr>
+      <tr><td class="field-name">gender</td><td class="field-type">'boy_group' | 'girl_group'</td><td class="field-req">required</td><td class="field-desc">Group type</td></tr>
+      <tr><td class="field-name">debutDate</td><td class="field-type">string (ISO 8601)</td><td class="field-req">required</td><td class="field-desc">Official debut date</td></tr>
+      <tr><td class="field-name">agency</td><td class="field-type">string</td><td class="field-req">required</td><td class="field-desc">Management/label company name</td></tr>
+      <tr><td class="field-name">fandomName</td><td class="field-type">string</td><td class="field-req">required</td><td class="field-desc">Official fan club name</td></tr>
+      <tr><td class="field-name">memberIds</td><td class="field-type">string[]</td><td class="field-req">required</td><td class="field-desc">Array of Member IDs (6–9)</td></tr>
+      <tr><td class="field-name">active</td><td class="field-type">boolean</td><td class="field-req">required</td><td class="field-desc">Whether the band is currently active</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══ MEMBER ═══ -->
+  <section class="section" id="member">
+    <div class="section-label">Core Entity</div>
+    <h2>Member</h2>
+    <p>An individual band member. Includes personal details, internal band roles/positions, and references to their contract, health records, and optional solo profile.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Band</span>
+      <span class="relation-tag">SoloProfile (optional)</span>
+      <span class="relation-tag">Contract</span>
+      <span class="relation-tag">HealthRecord[]</span>
+      <span class="relation-tag">Endorsement[]</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'member-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'member-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="member-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">BandPosition</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'main_vocalist'</span>  <span class="p">|</span> <span class="s">'lead_vocalist'</span>
+  <span class="p">|</span> <span class="s">'main_dancer'</span>    <span class="p">|</span> <span class="s">'lead_dancer'</span>
+  <span class="p">|</span> <span class="s">'main_rapper'</span>    <span class="p">|</span> <span class="s">'lead_rapper'</span>
+  <span class="p">|</span> <span class="s">'visual'</span>         <span class="p">|</span> <span class="s">'center'</span>
+  <span class="p">|</span> <span class="s">'leader'</span>         <span class="p">|</span> <span class="s">'maknae'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">Member</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>              <span class="t">string</span><span class="p">;</span>
+  <span class="key">bandId</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">stageName</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">koreanName</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>
+  <span class="key">legalName</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>          <span class="c">// sensitive — restricted access</span>
+  <span class="key">dateOfBirth</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>          <span class="c">// ISO 8601</span>
+  <span class="key">nationality</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>
+  <span class="key">positions</span><span class="p">:</span>       <span class="t">BandPosition</span><span class="p">[];</span>  <span class="c">// a member can hold multiple</span>
+  <span class="key">profileImageUrl</span><span class="p">:</span> <span class="t">string</span><span class="p">;</span>
+  <span class="key">soloProfileId</span><span class="p">:</span>   <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>   <span class="c">// null if no solo activity</span>
+  <span class="key">contractId</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>
+  <span class="key">active</span><span class="p">:</span>          <span class="t">boolean</span><span class="p">;</span>
+  <span class="key">createdAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">updatedAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="member-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>              <span class="s">"mem_03"</span><span class="p">,</span>
+  <span class="key">"bandId"</span><span class="p">:</span>          <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+  <span class="key">"stageName"</span><span class="p">:</span>       <span class="s">"RION"</span><span class="p">,</span>
+  <span class="key">"koreanName"</span><span class="p">:</span>      <span class="s">"리온"</span><span class="p">,</span>
+  <span class="key">"legalName"</span><span class="p">:</span>       <span class="s">"Kim Hyun-woo"</span><span class="p">,</span>
+  <span class="key">"dateOfBirth"</span><span class="p">:</span>     <span class="s">"2001-08-22"</span><span class="p">,</span>
+  <span class="key">"nationality"</span><span class="p">:</span>     <span class="s">"KR"</span><span class="p">,</span>
+  <span class="key">"positions"</span><span class="p">:</span>       <span class="p">[</span><span class="s">"main_vocalist"</span><span class="p">,</span> <span class="s">"visual"</span><span class="p">]</span><span class="p">,</span>
+  <span class="key">"profileImageUrl"</span><span class="p">:</span> <span class="s">"https://cdn.example.com/members/mem_03/profile.jpg"</span><span class="p">,</span>
+  <span class="key">"soloProfileId"</span><span class="p">:</span>   <span class="s">"solo_09"</span><span class="p">,</span>
+  <span class="key">"contractId"</span><span class="p">:</span>      <span class="s">"contract_A3"</span><span class="p">,</span>
+  <span class="key">"active"</span><span class="p">:</span>          <span class="n">true</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>       <span class="s">"2022-01-01T00:00:00Z"</span><span class="p">,</span>
+  <span class="key">"updatedAt"</span><span class="p">:</span>       <span class="s">"2026-04-10T14:22:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr><td class="field-name">positions</td><td class="field-type">BandPosition[]</td><td class="field-req">required</td><td class="field-desc">Formal K-pop roles. A member may hold more than one.</td></tr>
+      <tr><td class="field-name">soloProfileId</td><td class="field-type">string | null</td><td class="field-opt">optional</td><td class="field-desc">Links to a SoloProfile if this member has solo activity</td></tr>
+      <tr><td class="field-name">legalName</td><td class="field-type">string</td><td class="field-req">required</td><td class="field-desc">Full legal name — should be access-restricted in the UI</td></tr>
+      <tr><td class="field-name">nationality</td><td class="field-type">string (ISO 3166)</td><td class="field-req">required</td><td class="field-desc">Country code — relevant for visa/travel scheduling</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══ SOLO PROFILE ═══ -->
+  <section class="section" id="solo-profile">
+    <div class="section-label">Core Entity</div>
+    <h2>Solo Profile</h2>
+    <p>Extended profile for a member who has solo material. Not all members will have one. Holds solo-specific branding, discography references, and endorsements distinct from their group identity.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Member</span>
+      <span class="relation-tag">Release[]</span>
+      <span class="relation-tag">Endorsement[]</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'solo-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'solo-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="solo-ts" class="tab-content active">
+        <pre>
+<span class="k">interface</span> <span class="fn">SoloProfile</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>             <span class="t">string</span><span class="p">;</span>
+  <span class="key">memberId</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">soloStageName</span><span class="p">:</span>  <span class="t">string</span><span class="p">;</span>       <span class="c">// may differ from group stage name</span>
+  <span class="key">bio</span><span class="p">:</span>            <span class="t">string</span><span class="p">;</span>
+  <span class="key">genres</span><span class="p">:</span>         <span class="t">string</span><span class="p">[];</span>    <span class="c">// e.g. ['R&B', 'pop', 'hip-hop']</span>
+  <span class="key">releaseIds</span><span class="p">:</span>     <span class="t">string</span><span class="p">[];</span>    <span class="c">// solo Release ids</span>
+  <span class="key">endorsementIds</span><span class="p">:</span> <span class="t">string</span><span class="p">[];</span>    <span class="c">// solo-only brand deals</span>
+  <span class="key">socialHandles</span><span class="p">:</span>  <span class="t">SocialHandles</span><span class="p">;</span>
+  <span class="key">createdAt</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>
+  <span class="key">updatedAt</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="fn">SocialHandles</span> <span class="p">{</span>
+  <span class="key">instagram</span><span class="p">?:</span>  <span class="t">string</span><span class="p">;</span>
+  <span class="key">twitter</span><span class="p">?:</span>    <span class="t">string</span><span class="p">;</span>
+  <span class="key">tiktok</span><span class="p">?:</span>     <span class="t">string</span><span class="p">;</span>
+  <span class="key">youtube</span><span class="p">?:</span>    <span class="t">string</span><span class="p">;</span>
+  <span class="key">weibo</span><span class="p">?:</span>      <span class="t">string</span><span class="p">;</span>
+  <span class="key">bubble</span><span class="p">?:</span>     <span class="t">string</span><span class="p">;</span>   <span class="c">// K-pop fan messaging platform</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="solo-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>             <span class="s">"solo_09"</span><span class="p">,</span>
+  <span class="key">"memberId"</span><span class="p">:</span>       <span class="s">"mem_03"</span><span class="p">,</span>
+  <span class="key">"soloStageName"</span><span class="p">:</span>  <span class="s">"RION"</span><span class="p">,</span>
+  <span class="key">"bio"</span><span class="p">:</span>            <span class="s">"Multi-platinum solo artist and lead vocalist of NOVA SEVEN."</span><span class="p">,</span>
+  <span class="key">"genres"</span><span class="p">:</span>         <span class="p">[</span><span class="s">"R&B"</span><span class="p">,</span> <span class="s">"pop"</span><span class="p">]</span><span class="p">,</span>
+  <span class="key">"releaseIds"</span><span class="p">:</span>     <span class="p">[</span><span class="s">"rel_solo_01"</span><span class="p">,</span> <span class="s">"rel_solo_02"</span><span class="p">]</span><span class="p">,</span>
+  <span class="key">"endorsementIds"</span><span class="p">:</span> <span class="p">[</span><span class="s">"end_12"</span><span class="p">]</span><span class="p">,</span>
+  <span class="key">"socialHandles"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="key">"instagram"</span><span class="p">:</span>  <span class="s">"@rion_official"</span><span class="p">,</span>
+    <span class="key">"tiktok"</span><span class="p">:</span>     <span class="s">"@rion.music"</span><span class="p">,</span>
+    <span class="key">"youtube"</span><span class="p">:</span>    <span class="s">"@RIONofficial"</span><span class="p">,</span>
+    <span class="key">"bubble"</span><span class="p">:</span>     <span class="s">"rion_stellar"</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>      <span class="s">"2024-06-01T00:00:00Z"</span><span class="p">,</span>
+  <span class="key">"updatedAt"</span><span class="p">:</span>      <span class="s">"2026-03-14T11:00:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <hr />
+
+  <!-- ═══ RELEASE ═══ -->
+  <section class="section" id="release">
+    <div class="section-label">Releases</div>
+    <h2>Release</h2>
+    <p>The central discography entity. Covers albums, mini-albums (EPs), single albums, and digital singles — for both the group and solo artists. Sales, chart entries, and social snapshots all reference a Release ID.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Band</span>
+      <span class="relation-tag">Member (solo only)</span>
+      <span class="relation-tag">AlbumSales[]</span>
+      <span class="relation-tag">ChartEntry[]</span>
+      <span class="relation-tag">SocialSnapshot[]</span>
+      <span class="relation-tag">ScheduleEvent[]</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'release-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'release-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="release-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">ReleaseType</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'full_album'</span>
+  <span class="p">|</span> <span class="s">'mini_album'</span>      <span class="c">// EP (4–7 tracks)</span>
+  <span class="p">|</span> <span class="s">'single_album'</span>    <span class="c">// 1–3 tracks, physical</span>
+  <span class="p">|</span> <span class="s">'digital_single'</span>
+  <span class="p">|</span> <span class="s">'repackage'</span>       <span class="c">// re-release with bonus tracks</span>
+  <span class="p">|</span> <span class="s">'collaboration'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">Track</span> <span class="p">{</span>
+  <span class="key">trackNumber</span><span class="p">:</span>  <span class="t">number</span><span class="p">;</span>
+  <span class="key">title</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>
+  <span class="key">durationSec</span><span class="p">:</span>  <span class="t">number</span><span class="p">;</span>
+  <span class="key">isTitleTrack</span><span class="p">:</span> <span class="t">boolean</span><span class="p">;</span>   <span class="c">// lead single / promoted track</span>
+  <span class="key">mvUrl</span><span class="p">?:</span>       <span class="t">string</span><span class="p">;</span>    <span class="c">// YouTube MV link</span>
+  <span class="key">mvViewCount</span><span class="p">?:</span> <span class="t">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="fn">Release</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>            <span class="t">string</span><span class="p">;</span>
+  <span class="key">bandId</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>
+  <span class="key">memberId</span><span class="p">:</span>      <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>  <span class="c">// null for group releases</span>
+  <span class="key">title</span><span class="p">:</span>         <span class="t">string</span><span class="p">;</span>
+  <span class="key">koreanTitle</span><span class="p">:</span>   <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>
+  <span class="key">type</span><span class="p">:</span>          <span class="t">ReleaseType</span><span class="p">;</span>
+  <span class="key">releaseDate</span><span class="p">:</span>   <span class="t">string</span><span class="p">;</span>         <span class="c">// ISO 8601</span>
+  <span class="key">coverArtUrl</span><span class="p">:</span>   <span class="t">string</span><span class="p">;</span>
+  <span class="key">tracks</span><span class="p">:</span>        <span class="t">Track</span><span class="p">[];</span>
+  <span class="key">era</span><span class="p">:</span>           <span class="t">string</span><span class="p">;</span>         <span class="c">// e.g. "SUPERNOVA era" — for grouping</span>
+  <span class="key">createdAt</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="release-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>           <span class="s">"rel_004"</span><span class="p">,</span>
+  <span class="key">"bandId"</span><span class="p">:</span>       <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+  <span class="key">"memberId"</span><span class="p">:</span>     <span class="n">null</span><span class="p">,</span>
+  <span class="key">"title"</span><span class="p">:</span>        <span class="s">"SUPERNOVA"</span><span class="p">,</span>
+  <span class="key">"koreanTitle"</span><span class="p">:</span>  <span class="s">"슈퍼노바"</span><span class="p">,</span>
+  <span class="key">"type"</span><span class="p">:</span>         <span class="s">"mini_album"</span><span class="p">,</span>
+  <span class="key">"releaseDate"</span><span class="p">:</span>  <span class="s">"2025-11-07"</span><span class="p">,</span>
+  <span class="key">"coverArtUrl"</span><span class="p">:</span>  <span class="s">"https://cdn.example.com/releases/rel_004/cover.jpg"</span><span class="p">,</span>
+  <span class="key">"era"</span><span class="p">:</span>          <span class="s">"SUPERNOVA era"</span><span class="p">,</span>
+  <span class="key">"tracks"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="key">"trackNumber"</span><span class="p">:</span>  <span class="n">1</span><span class="p">,</span>
+      <span class="key">"title"</span><span class="p">:</span>        <span class="s">"SUPERNOVA"</span><span class="p">,</span>
+      <span class="key">"durationSec"</span><span class="p">:</span>  <span class="n">198</span><span class="p">,</span>
+      <span class="key">"isTitleTrack"</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+      <span class="key">"mvUrl"</span><span class="p">:</span>        <span class="s">"https://youtube.com/watch?v=abc123"</span><span class="p">,</span>
+      <span class="key">"mvViewCount"</span><span class="p">:</span>  <span class="n">148200000</span>
+    <span class="p">}</span>
+  <span class="p">]</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>    <span class="s">"2025-10-01T00:00:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">💡</span>
+      <p><strong>Era grouping:</strong> The <code>era</code> field allows you to group releases, schedules, social snapshots, and chart entries under a single promotional campaign — making cross-entity analytics significantly easier.</p>
+    </div>
+  </section>
+
+  <!-- ═══ ALBUM SALES ═══ -->
+  <section class="section" id="album-sales">
+    <div class="section-label">Read-only · Analytics</div>
+    <h2>Album Sales</h2>
+    <p>Periodic sales snapshots linked to a Release. Read-only in the admin UI. Data may be ingested from Gaon, Hanteo, or distributor APIs.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Release</span>
+      <span class="relation-tag">Band</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'sales-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'sales-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="sales-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">SalesSource</span> <span class="p">=</span> <span class="s">'hanteo'</span> <span class="p">|</span> <span class="s">'gaon'</span> <span class="p">|</span> <span class="s">'circle'</span> <span class="p">|</span> <span class="s">'internal'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">AlbumSales</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>              <span class="t">string</span><span class="p">;</span>
+  <span class="key">releaseId</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">bandId</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">reportedAt</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>        <span class="c">// ISO 8601 date of snapshot</span>
+  <span class="key">source</span><span class="p">:</span>          <span class="t">SalesSource</span><span class="p">;</span>
+  <span class="key">physicalUnits</span><span class="p">:</span>   <span class="t">number</span><span class="p">;</span>
+  <span class="key">digitalUnits</span><span class="p">:</span>    <span class="t">number</span><span class="p">;</span>
+  <span class="key">totalUnits</span><span class="p">:</span>      <span class="t">number</span><span class="p">;</span>        <span class="c">// physicalUnits + digitalUnits</span>
+  <span class="key">revenueUSD</span><span class="p">:</span>      <span class="t">number</span><span class="p">;</span>
+  <span class="key">territoryBreakdown</span><span class="p">?:</span> <span class="t">Record</span><span class="p">&lt;</span><span class="t">string</span><span class="p">,</span> <span class="t">number</span><span class="p">&gt;;</span>  <span class="c">// { "KR": 80000, "US": 22000 }</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="sales-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>             <span class="s">"sales_0091"</span><span class="p">,</span>
+  <span class="key">"releaseId"</span><span class="p">:</span>      <span class="s">"rel_004"</span><span class="p">,</span>
+  <span class="key">"bandId"</span><span class="p">:</span>         <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+  <span class="key">"reportedAt"</span><span class="p">:</span>     <span class="s">"2025-11-14"</span><span class="p">,</span>
+  <span class="key">"source"</span><span class="p">:</span>         <span class="s">"hanteo"</span><span class="p">,</span>
+  <span class="key">"physicalUnits"</span><span class="p">:</span>  <span class="n">820000</span><span class="p">,</span>
+  <span class="key">"digitalUnits"</span><span class="p">:</span>   <span class="n">210000</span><span class="p">,</span>
+  <span class="key">"totalUnits"</span><span class="p">:</span>     <span class="n">1030000</span><span class="p">,</span>
+  <span class="key">"revenueUSD"</span><span class="p">:</span>     <span class="n">14420000</span><span class="p">,</span>
+  <span class="key">"territoryBreakdown"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="key">"KR"</span><span class="p">:</span> <span class="n">620000</span><span class="p">,</span>
+    <span class="key">"US"</span><span class="p">:</span> <span class="n">180000</span><span class="p">,</span>
+    <span class="key">"JP"</span><span class="p">:</span> <span class="n">140000</span><span class="p">,</span>
+    <span class="key">"OTHER"</span><span class="p">:</span> <span class="n">90000</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CHART ENTRY ═══ -->
+  <section class="section" id="chart-entry">
+    <div class="section-label">Read-only · Analytics</div>
+    <h2>Chart Entry</h2>
+    <p>A single chart position snapshot for a track or release on a given chart and date. Multiple entries over time build the chart history for a release.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Release</span>
+      <span class="relation-tag">Band</span>
+      <span class="relation-tag">Member (solo)</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'chart-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'chart-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="chart-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">ChartName</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'melon_daily'</span>      <span class="p">|</span> <span class="s">'melon_realtime'</span>
+  <span class="p">|</span> <span class="s">'gaon_digital'</span>     <span class="p">|</span> <span class="s">'gaon_physical'</span>
+  <span class="p">|</span> <span class="s">'billboard_hot100'</span> <span class="p">|</span> <span class="s">'billboard_global'</span>
+  <span class="p">|</span> <span class="s">'spotify_global'</span>   <span class="p">|</span> <span class="s">'apple_music_global'</span>
+  <span class="p">|</span> <span class="s">'youtube_trending'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">ChartEntry</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>           <span class="t">string</span><span class="p">;</span>
+  <span class="key">releaseId</span><span class="p">:</span>    <span class="t">string</span><span class="p">;</span>
+  <span class="key">trackTitle</span><span class="p">:</span>   <span class="t">string</span><span class="p">;</span>      <span class="c">// denormalized for quick display</span>
+  <span class="key">chart</span><span class="p">:</span>        <span class="t">ChartName</span><span class="p">;</span>
+  <span class="key">position</span><span class="p">:</span>     <span class="t">number</span><span class="p">;</span>
+  <span class="key">peakPosition</span><span class="p">:</span> <span class="t">number</span><span class="p">;</span>
+  <span class="key">weeksOnChart</span><span class="p">:</span> <span class="t">number</span><span class="p">;</span>
+  <span class="key">chartDate</span><span class="p">:</span>    <span class="t">string</span><span class="p">;</span>      <span class="c">// ISO 8601 date of this snapshot</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="chart-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>           <span class="s">"chart_2291"</span><span class="p">,</span>
+  <span class="key">"releaseId"</span><span class="p">:</span>    <span class="s">"rel_004"</span><span class="p">,</span>
+  <span class="key">"trackTitle"</span><span class="p">:</span>   <span class="s">"SUPERNOVA"</span><span class="p">,</span>
+  <span class="key">"chart"</span><span class="p">:</span>        <span class="s">"billboard_hot100"</span><span class="p">,</span>
+  <span class="key">"position"</span><span class="p">:</span>     <span class="n">4</span><span class="p">,</span>
+  <span class="key">"peakPosition"</span><span class="p">:</span> <span class="n">2</span><span class="p">,</span>
+  <span class="key">"weeksOnChart"</span><span class="p">:</span> <span class="n">8</span><span class="p">,</span>
+  <span class="key">"chartDate"</span><span class="p">:</span>    <span class="s">"2026-01-04"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SOCIAL SNAPSHOT ═══ -->
+  <section class="section" id="social-snapshot">
+    <div class="section-label">Read-only · Analytics</div>
+    <h2>Social Snapshot</h2>
+    <p>A point-in-time capture of social media metrics across platforms. Snapshots can be tied to a specific Release (for release-week correlation) or to a Band or Member broadly. Ingested from platform APIs — read-only in admin.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Band</span>
+      <span class="relation-tag">Member (optional)</span>
+      <span class="relation-tag">Release (optional)</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'social-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'social-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="social-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">SocialPlatform</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'instagram'</span> <span class="p">|</span> <span class="s">'tiktok'</span>
+  <span class="p">|</span> <span class="s">'twitter'</span>   <span class="p">|</span> <span class="s">'youtube'</span>
+  <span class="p">|</span> <span class="s">'weibo'</span>     <span class="p">|</span> <span class="s">'vlive'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">PlatformMetrics</span> <span class="p">{</span>
+  <span class="key">platform</span><span class="p">:</span>        <span class="t">SocialPlatform</span><span class="p">;</span>
+  <span class="key">followers</span><span class="p">:</span>       <span class="t">number</span><span class="p">;</span>
+  <span class="key">followersGrowth</span><span class="p">:</span> <span class="t">number</span><span class="p">;</span>   <span class="c">// delta since last snapshot</span>
+  <span class="key">engagementRate</span><span class="p">:</span>  <span class="t">number</span><span class="p">;</span>   <span class="c">// percentage</span>
+  <span class="key">impressions</span><span class="p">?:</span>    <span class="t">number</span><span class="p">;</span>
+  <span class="key">trendingTopics</span><span class="p">?:</span> <span class="t">string</span><span class="p">[];</span> <span class="c">// hashtags trending for this entity</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="fn">SocialSnapshot</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">bandId</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>
+  <span class="key">memberId</span><span class="p">?:</span>   <span class="t">string</span><span class="p">;</span>         <span class="c">// if scoped to a specific member</span>
+  <span class="key">releaseId</span><span class="p">?:</span>  <span class="t">string</span><span class="p">;</span>         <span class="c">// if tied to a release window</span>
+  <span class="key">snapshotAt</span><span class="p">:</span>  <span class="t">string</span><span class="p">;</span>         <span class="c">// ISO 8601 datetime</span>
+  <span class="key">platforms</span><span class="p">:</span>   <span class="t">PlatformMetrics</span><span class="p">[];</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="social-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>          <span class="s">"snap_0441"</span><span class="p">,</span>
+  <span class="key">"bandId"</span><span class="p">:</span>      <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+  <span class="key">"releaseId"</span><span class="p">:</span>  <span class="s">"rel_004"</span><span class="p">,</span>
+  <span class="key">"snapshotAt"</span><span class="p">:</span>  <span class="s">"2025-11-08T00:00:00Z"</span><span class="p">,</span>
+  <span class="key">"platforms"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="key">"platform"</span><span class="p">:</span>        <span class="s">"tiktok"</span><span class="p">,</span>
+      <span class="key">"followers"</span><span class="p">:</span>       <span class="n">14800000</span><span class="p">,</span>
+      <span class="key">"followersGrowth"</span><span class="p">:</span> <span class="n">320000</span><span class="p">,</span>
+      <span class="key">"engagementRate"</span><span class="p">:</span>  <span class="n">8.4</span><span class="p">,</span>
+      <span class="key">"trendingTopics"</span><span class="p">:</span>  <span class="p">[</span><span class="s">"#SUPERNOVA"</span><span class="p">,</span> <span class="s">"#NOVASEVEN"</span><span class="p">,</span> <span class="s">"#NOVASEVEN_SUPERNOVA"</span><span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <hr />
+
+  <!-- ═══ VENUE ═══ -->
+  <section class="section" id="venue">
+    <div class="section-label">Operations</div>
+    <h2>Venue</h2>
+    <p>A physical location where the band can perform. Includes capacity, technical specs, and geographic data. Venues accumulate their own incident history independently.</p>
+
+    <div class="relations">
+      <span class="relation-tag">ScheduleEvent[]</span>
+      <span class="relation-tag">Incident[]</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'venue-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'venue-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="venue-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">VenueType</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'arena'</span>       <span class="p">|</span> <span class="s">'stadium'</span>
+  <span class="p">|</span> <span class="s">'concert_hall'</span><span class="p">|</span> <span class="s">'club'</span>
+  <span class="p">|</span> <span class="s">'outdoor'</span>     <span class="p">|</span> <span class="s">'festival_grounds'</span>
+  <span class="p">|</span> <span class="s">'tv_studio'</span>   <span class="p">|</span> <span class="s">'showcase_hall'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">Venue</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>             <span class="t">string</span><span class="p">;</span>
+  <span class="key">name</span><span class="p">:</span>           <span class="t">string</span><span class="p">;</span>
+  <span class="key">type</span><span class="p">:</span>           <span class="t">VenueType</span><span class="p">;</span>
+  <span class="key">address</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>
+  <span class="key">city</span><span class="p">:</span>           <span class="t">string</span><span class="p">;</span>
+  <span class="key">country</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>         <span class="c">// ISO 3166</span>
+  <span class="key">timezone</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>         <span class="c">// IANA timezone string</span>
+  <span class="key">capacity</span><span class="p">:</span>       <span class="t">number</span><span class="p">;</span>
+  <span class="key">isOutdoor</span><span class="p">:</span>      <span class="t">boolean</span><span class="p">;</span>
+  <span class="key">contactEmail</span><span class="p">:</span>   <span class="t">string</span><span class="p">;</span>
+  <span class="key">websiteUrl</span><span class="p">?:</span>    <span class="t">string</span><span class="p">;</span>
+  <span class="key">notes</span><span class="p">?:</span>         <span class="t">string</span><span class="p">;</span>         <span class="c">// internal booking notes</span>
+  <span class="key">createdAt</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="venue-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>            <span class="s">"venue_041"</span><span class="p">,</span>
+  <span class="key">"name"</span><span class="p">:</span>          <span class="s">"Seoul Olympic Gymnastics Arena"</span><span class="p">,</span>
+  <span class="key">"type"</span><span class="p">:</span>          <span class="s">"arena"</span><span class="p">,</span>
+  <span class="key">"address"</span><span class="p">:</span>       <span class="s">"424 Olympic-ro, Songpa-gu"</span><span class="p">,</span>
+  <span class="key">"city"</span><span class="p">:</span>          <span class="s">"Seoul"</span><span class="p">,</span>
+  <span class="key">"country"</span><span class="p">:</span>       <span class="s">"KR"</span><span class="p">,</span>
+  <span class="key">"timezone"</span><span class="p">:</span>      <span class="s">"Asia/Seoul"</span><span class="p">,</span>
+  <span class="key">"capacity"</span><span class="p">:</span>      <span class="n">12000</span><span class="p">,</span>
+  <span class="key">"isOutdoor"</span><span class="p">:</span>     <span class="n">false</span><span class="p">,</span>
+  <span class="key">"contactEmail"</span><span class="p">:</span>  <span class="s">"booking@kspo.or.kr"</span><span class="p">,</span>
+  <span class="key">"websiteUrl"</span><span class="p">:</span>    <span class="s">"https://www.kspo.or.kr"</span><span class="p">,</span>
+  <span class="key">"notes"</span><span class="p">:</span>         <span class="s">"Preferred arena for Seoul concerts. Load-in requires 48hr advance."</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>     <span class="s">"2023-01-15T00:00:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SCHEDULE EVENT ═══ -->
+  <section class="section" id="schedule-event">
+    <div class="section-label">Operations</div>
+    <h2>Schedule Event</h2>
+    <p>Any time-bound activity on the band's calendar — concerts, fan meets, TV appearances, press days, music show performances, award shows, and more. The relational hub of the operations side of the platform.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Band</span>
+      <span class="relation-tag">Venue (optional)</span>
+      <span class="relation-tag">Member[] (optional)</span>
+      <span class="relation-tag">Release (optional)</span>
+      <span class="relation-tag">Incident[]</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'sched-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'sched-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="sched-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">EventType</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'concert'</span>         <span class="p">|</span> <span class="s">'fan_meeting'</span>
+  <span class="p">|</span> <span class="s">'music_show'</span>      <span class="p">|</span> <span class="s">'award_show'</span>
+  <span class="p">|</span> <span class="s">'press_conference'</span><span class="p">|</span> <span class="s">'interview'</span>
+  <span class="p">|</span> <span class="s">'photoshoot'</span>      <span class="p">|</span> <span class="s">'mv_shoot'</span>
+  <span class="p">|</span> <span class="s">'showcase'</span>        <span class="p">|</span> <span class="s">'rehearsal'</span>
+  <span class="p">|</span> <span class="s">'travel'</span>          <span class="p">|</span> <span class="s">'rest_day'</span>
+  <span class="p">|</span> <span class="s">'endorsement_shoot'</span><span class="p">;</span>
+
+<span class="k">type</span> <span class="t">EventStatus</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'scheduled'</span>  <span class="p">|</span> <span class="s">'confirmed'</span>
+  <span class="p">|</span> <span class="s">'completed'</span>  <span class="p">|</span> <span class="s">'cancelled'</span>
+  <span class="p">|</span> <span class="s">'postponed'</span>  <span class="p">|</span> <span class="s">'at_risk'</span><span class="p">;</span>   <span class="c">// auto-flagged when linked incident exists</span>
+
+<span class="k">interface</span> <span class="fn">ScheduleEvent</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>              <span class="t">string</span><span class="p">;</span>
+  <span class="key">bandId</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">title</span><span class="p">:</span>           <span class="t">string</span><span class="p">;</span>
+  <span class="key">type</span><span class="p">:</span>            <span class="t">EventType</span><span class="p">;</span>
+  <span class="key">status</span><span class="p">:</span>          <span class="t">EventStatus</span><span class="p">;</span>
+  <span class="key">startDatetime</span><span class="p">:</span>   <span class="t">string</span><span class="p">;</span>         <span class="c">// ISO 8601</span>
+  <span class="key">endDatetime</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>
+  <span class="key">venueId</span><span class="p">?:</span>        <span class="t">string</span><span class="p">;</span>         <span class="c">// null for non-venue events</span>
+  <span class="key">memberIds</span><span class="p">?:</span>      <span class="t">string</span><span class="p">[];</span>       <span class="c">// if not full group</span>
+  <span class="key">releaseId</span><span class="p">?:</span>      <span class="t">string</span><span class="p">;</span>         <span class="c">// linked release if applicable</span>
+  <span class="key">incidentIds</span><span class="p">:</span>     <span class="t">string</span><span class="p">[];</span>       <span class="c">// any disruptions linked to this event</span>
+  <span class="key">notes</span><span class="p">?:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">createdAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">updatedAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="sched-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>            <span class="s">"evt_0388"</span><span class="p">,</span>
+  <span class="key">"bandId"</span><span class="p">:</span>        <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+  <span class="key">"title"</span><span class="p">:</span>         <span class="s">"SUPERNOVA World Tour — Seoul Night 1"</span><span class="p">,</span>
+  <span class="key">"type"</span><span class="p">:</span>          <span class="s">"concert"</span><span class="p">,</span>
+  <span class="key">"status"</span><span class="p">:</span>        <span class="s">"at_risk"</span><span class="p">,</span>
+  <span class="key">"startDatetime"</span><span class="p">:</span> <span class="s">"2026-03-14T19:00:00+09:00"</span><span class="p">,</span>
+  <span class="key">"endDatetime"</span><span class="p">:</span>   <span class="s">"2026-03-14T22:30:00+09:00"</span><span class="p">,</span>
+  <span class="key">"venueId"</span><span class="p">:</span>       <span class="s">"venue_041"</span><span class="p">,</span>
+  <span class="key">"memberIds"</span><span class="p">:</span>     <span class="n">null</span><span class="p">,</span>
+  <span class="key">"releaseId"</span><span class="p">:</span>     <span class="s">"rel_004"</span><span class="p">,</span>
+  <span class="key">"incidentIds"</span><span class="p">:</span>   <span class="p">[</span><span class="s">"inc_019"</span><span class="p">]</span><span class="p">,</span>
+  <span class="key">"notes"</span><span class="p">:</span>         <span class="s">"RION flagged as vocal rest — status under review."</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>     <span class="s">"2025-09-01T00:00:00Z"</span><span class="p">,</span>
+  <span class="key">"updatedAt"</span><span class="p">:</span>     <span class="s">"2026-03-10T08:44:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠️</span>
+      <p><strong>at_risk status:</strong> When an Incident is linked to a ScheduleEvent and is unresolved, the event's status should be automatically elevated to <code>at_risk</code>. This is a key cross-entity business rule to implement in your application layer.</p>
+    </div>
+  </section>
+
+  <!-- ═══ INCIDENT ═══ -->
+  <section class="section" id="incident">
+    <div class="section-label">Operations</div>
+    <h2>Incident</h2>
+    <p>A disruption event — either personal (affecting a member) or operational (affecting a venue or scheduled event). The <code>category</code> and <code>subtype</code> fields cover the full range of real-world K-pop disruptions.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Member (optional)</span>
+      <span class="relation-tag">Venue (optional)</span>
+      <span class="relation-tag">ScheduleEvent[]</span>
+    </div>
+
+    <div class="alert alert-info" style="margin-top:0; margin-bottom:24px;">
+      <span class="alert-icon">📖</span>
+      <p><strong>Naming note:</strong> "Incident" was chosen over "Life Event" because it covers both personal and operational disruptions neutrally, maps cleanly to a single data type, and is unambiguous in admin/ops contexts.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'inc-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'inc-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="inc-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">IncidentCategory</span> <span class="p">=</span> <span class="s">'personal'</span> <span class="p">|</span> <span class="s">'venue'</span> <span class="p">|</span> <span class="s">'operational'</span><span class="p">;</span>
+
+<span class="k">type</span> <span class="t">PersonalSubtype</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'illness'</span>            <span class="c">// cold, flu, fever</span>
+  <span class="p">|</span> <span class="s">'injury'</span>             <span class="c">// sprain, fracture, vocal strain</span>
+  <span class="p">|</span> <span class="s">'mental_health_leave'</span>
+  <span class="p">|</span> <span class="s">'personal_leave'</span>     <span class="c">// family bereavement, personal reasons</span>
+  <span class="p">|</span> <span class="s">'visa_issue'</span>
+  <span class="p">|</span> <span class="s">'travel_delay'</span><span class="p">;</span>
+
+<span class="k">type</span> <span class="t">VenueSubtype</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'weather_event'</span>      <span class="c">// typhoon, blizzard, extreme heat</span>
+  <span class="p">|</span> <span class="s">'structural_damage'</span>
+  <span class="p">|</span> <span class="s">'power_failure'</span>
+  <span class="p">|</span> <span class="s">'permit_revoked'</span>
+  <span class="p">|</span> <span class="s">'double_booking'</span>
+  <span class="p">|</span> <span class="s">'safety_violation'</span><span class="p">;</span>
+
+<span class="k">type</span> <span class="t">OperationalSubtype</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'promoter_cancellation'</span>
+  <span class="p">|</span> <span class="s">'sponsor_withdrawal'</span>
+  <span class="p">|</span> <span class="s">'broadcast_schedule_conflict'</span>
+  <span class="p">|</span> <span class="s">'public_safety_advisory'</span>  <span class="c">// govt-issued, e.g. protest, civil unrest</span>
+  <span class="p">|</span> <span class="s">'force_majeure'</span><span class="p">;</span>
+
+<span class="k">type</span> <span class="t">IncidentSeverity</span> <span class="p">=</span> <span class="s">'low'</span> <span class="p">|</span> <span class="s">'medium'</span> <span class="p">|</span> <span class="s">'high'</span> <span class="p">|</span> <span class="s">'critical'</span><span class="p">;</span>
+<span class="k">type</span> <span class="t">IncidentStatus</span>   <span class="p">=</span> <span class="s">'open'</span> <span class="p">|</span> <span class="s">'monitoring'</span> <span class="p">|</span> <span class="s">'resolved'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">Incident</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>                 <span class="t">string</span><span class="p">;</span>
+  <span class="key">category</span><span class="p">:</span>           <span class="t">IncidentCategory</span><span class="p">;</span>
+  <span class="key">subtype</span><span class="p">:</span>            <span class="t">PersonalSubtype</span> <span class="p">|</span> <span class="t">VenueSubtype</span> <span class="p">|</span> <span class="t">OperationalSubtype</span><span class="p">;</span>
+  <span class="key">severity</span><span class="p">:</span>           <span class="t">IncidentSeverity</span><span class="p">;</span>
+  <span class="key">status</span><span class="p">:</span>             <span class="t">IncidentStatus</span><span class="p">;</span>
+  <span class="key">title</span><span class="p">:</span>              <span class="t">string</span><span class="p">;</span>
+  <span class="key">description</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>
+  <span class="key">memberId</span><span class="p">?:</span>          <span class="t">string</span><span class="p">;</span>         <span class="c">// for personal incidents</span>
+  <span class="key">venueId</span><span class="p">?:</span>           <span class="t">string</span><span class="p">;</span>         <span class="c">// for venue incidents</span>
+  <span class="key">affectedEventIds</span><span class="p">:</span>   <span class="t">string</span><span class="p">[];</span>       <span class="c">// ScheduleEvents impacted</span>
+  <span class="key">occurredAt</span><span class="p">:</span>         <span class="t">string</span><span class="p">;</span>         <span class="c">// ISO 8601</span>
+  <span class="key">resolvedAt</span><span class="p">?:</span>         <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>
+  <span class="key">createdAt</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">updatedAt</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="inc-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>               <span class="s">"inc_019"</span><span class="p">,</span>
+  <span class="key">"category"</span><span class="p">:</span>         <span class="s">"personal"</span><span class="p">,</span>
+  <span class="key">"subtype"</span><span class="p">:</span>          <span class="s">"injury"</span><span class="p">,</span>
+  <span class="key">"severity"</span><span class="p">:</span>         <span class="s">"high"</span><span class="p">,</span>
+  <span class="key">"status"</span><span class="p">:</span>           <span class="s">"monitoring"</span><span class="p">,</span>
+  <span class="key">"title"</span><span class="p">:</span>            <span class="s">"RION — Vocal Cord Strain"</span><span class="p">,</span>
+  <span class="key">"description"</span><span class="p">:</span>      <span class="s">"Diagnosed with acute vocal cord strain following rehearsal on Mar 8. Doctor recommends 7 days vocal rest minimum."</span><span class="p">,</span>
+  <span class="key">"memberId"</span><span class="p">:</span>         <span class="s">"mem_03"</span><span class="p">,</span>
+  <span class="key">"venueId"</span><span class="p">:</span>          <span class="n">null</span><span class="p">,</span>
+  <span class="key">"affectedEventIds"</span><span class="p">:</span> <span class="p">[</span><span class="s">"evt_0388"</span><span class="p">,</span> <span class="s">"evt_0389"</span><span class="p">]</span><span class="p">,</span>
+  <span class="key">"occurredAt"</span><span class="p">:</span>       <span class="s">"2026-03-08T00:00:00Z"</span><span class="p">,</span>
+  <span class="key">"resolvedAt"</span><span class="p">:</span>       <span class="n">null</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>        <span class="s">"2026-03-08T14:00:00Z"</span><span class="p">,</span>
+  <span class="key">"updatedAt"</span><span class="p">:</span>        <span class="s">"2026-03-10T09:00:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <hr />
+
+  <!-- ═══ HEALTH RECORD ═══ -->
+  <section class="section" id="health-record">
+    <div class="section-label">People & Business</div>
+    <h2>Health Record</h2>
+    <p>Ongoing physical and mental health tracking for a member, distinct from Incidents. While an Incident is a disruptive event, a Health Record is a longitudinal log — check-ups, fitness assessments, flagged concerns — managed by the agency's medical staff.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Member</span>
+      <span class="relation-tag">Incident (via reference)</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'health-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'health-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="health-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">HealthRecordType</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'routine_checkup'</span>
+  <span class="p">|</span> <span class="s">'fitness_assessment'</span>
+  <span class="p">|</span> <span class="s">'mental_health_session'</span>
+  <span class="p">|</span> <span class="s">'dietary_review'</span>
+  <span class="p">|</span> <span class="s">'specialist_referral'</span>
+  <span class="p">|</span> <span class="s">'follow_up'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">HealthRecord</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>             <span class="t">string</span><span class="p">;</span>
+  <span class="key">memberId</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">type</span><span class="p">:</span>           <span class="t">HealthRecordType</span><span class="p">;</span>
+  <span class="key">date</span><span class="p">:</span>           <span class="t">string</span><span class="p">;</span>              <span class="c">// ISO 8601</span>
+  <span class="key">provider</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>              <span class="c">// doctor / clinic name</span>
+  <span class="key">summary</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>              <span class="c">// admin-facing summary only</span>
+  <span class="key">flagged</span><span class="p">:</span>        <span class="t">boolean</span><span class="p">;</span>             <span class="c">// true if action required</span>
+  <span class="key">linkedIncidentId</span><span class="p">?:</span> <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>  <span class="c">// if this record resulted from an Incident</span>
+  <span class="key">nextReviewDate</span><span class="p">?:</span> <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>
+  <span class="key">createdAt</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="health-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>              <span class="s">"health_0077"</span><span class="p">,</span>
+  <span class="key">"memberId"</span><span class="p">:</span>        <span class="s">"mem_03"</span><span class="p">,</span>
+  <span class="key">"type"</span><span class="p">:</span>            <span class="s">"follow_up"</span><span class="p">,</span>
+  <span class="key">"date"</span><span class="p">:</span>            <span class="s">"2026-03-09"</span><span class="p">,</span>
+  <span class="key">"provider"</span><span class="p">:</span>        <span class="s">"Seoul Voice & ENT Clinic"</span><span class="p">,</span>
+  <span class="key">"summary"</span><span class="p">:</span>         <span class="s">"Follow-up after vocal strain diagnosis. 7-day rest confirmed. No surgery required. Cleared for light activity only."</span><span class="p">,</span>
+  <span class="key">"flagged"</span><span class="p">:</span>         <span class="n">true</span><span class="p">,</span>
+  <span class="key">"linkedIncidentId"</span><span class="p">:</span><span class="s">"inc_019"</span><span class="p">,</span>
+  <span class="key">"nextReviewDate"</span><span class="p">:</span>  <span class="s">"2026-03-16"</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>       <span class="s">"2026-03-09T11:30:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CONTRACT ═══ -->
+  <section class="section" id="contract">
+    <div class="section-label">People & Business</div>
+    <h2>Contract</h2>
+    <p>Legal agreement between a member and the agency. Tracks term, revenue splits, and key clauses. Sensitive — should be restricted to specific admin roles in the UI.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Member</span>
+      <span class="relation-tag">Band</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'contract-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'contract-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="contract-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">ContractStatus</span> <span class="p">=</span> <span class="s">'active'</span> <span class="p">|</span> <span class="s">'expired'</span> <span class="p">|</span> <span class="s">'under_negotiation'</span> <span class="p">|</span> <span class="s">'terminated'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">RevenueSplit</span> <span class="p">{</span>
+  <span class="key">albumPercent</span><span class="p">:</span>       <span class="t">number</span><span class="p">;</span>
+  <span class="key">concertPercent</span><span class="p">:</span>     <span class="t">number</span><span class="p">;</span>
+  <span class="key">endorsementPercent</span><span class="p">:</span> <span class="t">number</span><span class="p">;</span>
+  <span class="key">merchandisePercent</span><span class="p">:</span> <span class="t">number</span><span class="p">;</span>
+  <span class="key">soloPercent</span><span class="p">?:</span>       <span class="t">number</span><span class="p">;</span>        <span class="c">// if member has solo deal</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="fn">Contract</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>              <span class="t">string</span><span class="p">;</span>
+  <span class="key">memberId</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>
+  <span class="key">bandId</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">status</span><span class="p">:</span>          <span class="t">ContractStatus</span><span class="p">;</span>
+  <span class="key">startDate</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">endDate</span><span class="p">:</span>         <span class="t">string</span><span class="p">;</span>
+  <span class="key">autoRenew</span><span class="p">:</span>       <span class="t">boolean</span><span class="p">;</span>
+  <span class="key">revenueSplit</span><span class="p">:</span>    <span class="t">RevenueSplit</span><span class="p">;</span>
+  <span class="key">clauses</span><span class="p">:</span>         <span class="t">string</span><span class="p">[];</span>       <span class="c">// plain-language clause summaries</span>
+  <span class="key">documentUrl</span><span class="p">?:</span>    <span class="t">string</span><span class="p">;</span>         <span class="c">// link to full PDF (secured storage)</span>
+  <span class="key">createdAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">updatedAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="contract-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>           <span class="s">"contract_A3"</span><span class="p">,</span>
+  <span class="key">"memberId"</span><span class="p">:</span>     <span class="s">"mem_03"</span><span class="p">,</span>
+  <span class="key">"bandId"</span><span class="p">:</span>       <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+  <span class="key">"status"</span><span class="p">:</span>       <span class="s">"active"</span><span class="p">,</span>
+  <span class="key">"startDate"</span><span class="p">:</span>    <span class="s">"2022-01-01"</span><span class="p">,</span>
+  <span class="key">"endDate"</span><span class="p">:</span>      <span class="s">"2029-12-31"</span><span class="p">,</span>
+  <span class="key">"autoRenew"</span><span class="p">:</span>    <span class="n">false</span><span class="p">,</span>
+  <span class="key">"revenueSplit"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="key">"albumPercent"</span><span class="p">:</span>       <span class="n">12</span><span class="p">,</span>
+    <span class="key">"concertPercent"</span><span class="p">:</span>     <span class="n">18</span><span class="p">,</span>
+    <span class="key">"endorsementPercent"</span><span class="p">:</span> <span class="n">20</span><span class="p">,</span>
+    <span class="key">"merchandisePercent"</span><span class="p">:</span> <span class="n">10</span><span class="p">,</span>
+    <span class="key">"soloPercent"</span><span class="p">:</span>        <span class="n">25</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="key">"clauses"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s">"Member must obtain agency approval before solo signing engagements."</span><span class="p">,</span>
+    <span class="s">"Agency retains right to approve all public statements and social posts."</span><span class="p">,</span>
+    <span class="s">"12-month non-compete clause applies upon termination."</span>
+  <span class="p">]</span><span class="p">,</span>
+  <span class="key">"documentUrl"</span><span class="p">:</span>  <span class="s">"https://secure.example.com/contracts/contract_A3.pdf"</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>    <span class="s">"2022-01-01T00:00:00Z"</span><span class="p">,</span>
+  <span class="key">"updatedAt"</span><span class="p">:</span>    <span class="s">"2024-06-01T00:00:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ENDORSEMENT ═══ -->
+  <section class="section" id="endorsement">
+    <div class="section-label">People & Business</div>
+    <h2>Endorsement</h2>
+    <p>A brand partnership or sponsorship deal. Can belong to the Band as a whole or to an individual Member (via their Solo Profile). Tracks deal value, term, and deliverables.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Band (optional)</span>
+      <span class="relation-tag">Member (optional)</span>
+      <span class="relation-tag">ScheduleEvent (endorsement_shoot)</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'end-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'end-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="end-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">EndorsementStatus</span> <span class="p">=</span> <span class="s">'active'</span> <span class="p">|</span> <span class="s">'completed'</span> <span class="p">|</span> <span class="s">'negotiating'</span> <span class="p">|</span> <span class="s">'cancelled'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">Endorsement</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>              <span class="t">string</span><span class="p">;</span>
+  <span class="key">brandName</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">status</span><span class="p">:</span>          <span class="t">EndorsementStatus</span><span class="p">;</span>
+  <span class="key">bandId</span><span class="p">?:</span>         <span class="t">string</span><span class="p">;</span>         <span class="c">// group deal</span>
+  <span class="key">memberId</span><span class="p">?:</span>       <span class="t">string</span><span class="p">;</span>         <span class="c">// individual deal</span>
+  <span class="key">startDate</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">endDate</span><span class="p">:</span>         <span class="t">string</span><span class="p">;</span>
+  <span class="key">dealValueUSD</span><span class="p">:</span>    <span class="t">number</span><span class="p">;</span>
+  <span class="key">deliverables</span><span class="p">:</span>    <span class="t">string</span><span class="p">[];</span>       <span class="c">// e.g. ["2 Instagram posts", "1 TVC appearance"]</span>
+  <span class="key">exclusivityTerms</span><span class="p">?:</span><span class="t">string</span><span class="p">;</span>        <span class="c">// e.g. "No competing skincare brands"</span>
+  <span class="key">notes</span><span class="p">?:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">createdAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+  <span class="key">updatedAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="end-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>              <span class="s">"end_12"</span><span class="p">,</span>
+  <span class="key">"brandName"</span><span class="p">:</span>       <span class="s">"Laneige"</span><span class="p">,</span>
+  <span class="key">"status"</span><span class="p">:</span>          <span class="s">"active"</span><span class="p">,</span>
+  <span class="key">"bandId"</span><span class="p">:</span>          <span class="n">null</span><span class="p">,</span>
+  <span class="key">"memberId"</span><span class="p">:</span>        <span class="s">"mem_03"</span><span class="p">,</span>
+  <span class="key">"startDate"</span><span class="p">:</span>       <span class="s">"2025-09-01"</span><span class="p">,</span>
+  <span class="key">"endDate"</span><span class="p">:</span>         <span class="s">"2026-08-31"</span><span class="p">,</span>
+  <span class="key">"dealValueUSD"</span><span class="p">:</span>    <span class="n">480000</span><span class="p">,</span>
+  <span class="key">"deliverables"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s">"3 Instagram posts per month"</span><span class="p">,</span>
+    <span class="s">"1 TVC appearance (filmed Oct 2025)"</span><span class="p">,</span>
+    <span class="s">"Exclusive ambassador credit on product packaging"</span>
+  <span class="p">]</span><span class="p">,</span>
+  <span class="key">"exclusivityTerms"</span><span class="p">:</span> <span class="s">"No competing skincare or cosmetics brands during term."</span><span class="p">,</span>
+  <span class="key">"notes"</span><span class="p">:</span>           <span class="s">"Renewal discussion scheduled for July 2026."</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>       <span class="s">"2025-08-01T00:00:00Z"</span><span class="p">,</span>
+  <span class="key">"updatedAt"</span><span class="p">:</span>       <span class="s">"2025-10-15T00:00:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <hr />
+
+  <!-- ═══ MEMBER APPEARANCE ═══ -->
+  <section class="section" id="member-appearance">
+    <div class="section-label">Game Layer · Visuals</div>
+    <h2>Member Appearance</h2>
+    <p>Drives the visual card rendered for each member. Assembled at runtime from a base face model plus expression and status overlay layers — no pre-saved combinations. A status like "sick" or "injured" is applied as a shared overlay that works across all 100 face models without additional art assets.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Member</span>
+      <span class="relation-tag">Incident (drives statusOverlay)</span>
+      <span class="relation-tag">HealthRecord (drives expression)</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'appearance-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'appearance-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="appearance-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">FaceExpression</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'neutral'</span>
+  <span class="p">|</span> <span class="s">'happy'</span>
+  <span class="p">|</span> <span class="s">'tired'</span>
+  <span class="p">|</span> <span class="s">'focused'</span>
+  <span class="p">|</span> <span class="s">'stressed'</span>
+  <span class="p">|</span> <span class="s">'proud'</span><span class="p">;</span>
+
+<span class="k">type</span> <span class="t">StatusOverlay</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'sick'</span>       <span class="c">// desaturated + flush tint</span>
+  <span class="p">|</span> <span class="s">'injured'</span>    <span class="c">// bandage asset layered on top</span>
+  <span class="p">|</span> <span class="s">'resting'</span>    <span class="c">// soft vignette, muted palette</span>
+  <span class="p">|</span> <span class="s">'on_leave'</span>   <span class="c">// greyed out, lock icon</span>
+  <span class="p">|</span> <span class="n">null</span><span class="p">;</span>         <span class="c">// no overlay — healthy</span>
+
+<span class="k">interface</span> <span class="fn">MemberAppearance</span> <span class="p">{</span>
+  <span class="key">memberId</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>
+  <span class="key">faceModelId</span><span class="p">:</span>   <span class="t">string</span><span class="p">;</span>      <span class="c">// e.g. "face_034" — one of 100 base models</span>
+  <span class="key">gender</span><span class="p">:</span>        <span class="s">'male'</span> <span class="p">|</span> <span class="s">'female'</span><span class="p">;</span>
+  <span class="key">expression</span><span class="p">:</span>    <span class="t">FaceExpression</span><span class="p">;</span>
+  <span class="key">statusOverlay</span><span class="p">:</span> <span class="t">StatusOverlay</span><span class="p">;</span>
+  <span class="key">updatedAt</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>      <span class="c">// ISO 8601 — when state last changed</span>
+<span class="p">}</span>
+
+<span class="c">// Resolved at render time — never stored</span>
+<span class="k">interface</span> <span class="fn">RenderedCard</span> <span class="p">{</span>
+  <span class="key">baseImageUrl</span><span class="p">:</span>    <span class="t">string</span><span class="p">;</span>   <span class="c">// "/faces/face_034.png"</span>
+  <span class="key">expressionUrl</span><span class="p">:</span>   <span class="t">string</span><span class="p">;</span>   <span class="c">// "/expressions/tired.png"</span>
+  <span class="key">overlayUrl</span><span class="p">:</span>      <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span> <span class="c">// "/overlays/injured.png"</span>
+  <span class="key">cssFilter</span><span class="p">:</span>       <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span> <span class="c">// e.g. "saturate(0.4)" for sick</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="appearance-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"memberId"</span><span class="p">:</span>      <span class="s">"mem_03"</span><span class="p">,</span>
+  <span class="key">"faceModelId"</span><span class="p">:</span>   <span class="s">"face_034"</span><span class="p">,</span>
+  <span class="key">"gender"</span><span class="p">:</span>        <span class="s">"male"</span><span class="p">,</span>
+  <span class="key">"expression"</span><span class="p">:</span>    <span class="s">"tired"</span><span class="p">,</span>
+  <span class="key">"statusOverlay"</span><span class="p">:</span> <span class="s">"injured"</span><span class="p">,</span>
+  <span class="key">"updatedAt"</span><span class="p">:</span>     <span class="s">"2026-03-08T14:00:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">💡</span>
+      <p><strong>Composition rule:</strong> <code>expression</code> and <code>statusOverlay</code> are shared assets applied on top of any base face. Adding a new status type requires one new overlay asset — not 100 new face variants. <code>RenderedCard</code> is computed by the UI layer and never persisted.</p>
+    </div>
+  </section>
+
+  <!-- ═══ WORLD EVENT ═══ -->
+  <section class="section" id="world-event">
+    <div class="section-label">Game Layer · Ticker</div>
+    <h2>World Event</h2>
+    <p>A ticker entry generated when the player advances time. World events are the read-only log of everything that happened during a time increment — chart movements, sales updates, venue flags, member risk alerts. They are facts, not decisions. Anything requiring a player response spawns an InboxMessage instead.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Band</span>
+      <span class="relation-tag">Member (optional)</span>
+      <span class="relation-tag">Venue (optional)</span>
+      <span class="relation-tag">Release (optional)</span>
+      <span class="relation-tag">Incident (optional)</span>
+      <span class="relation-tag">GameState (via gameDate)</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'wevent-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'wevent-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="wevent-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">WorldEventCategory</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'chart'</span>        <span class="c">// chart position updated</span>
+  <span class="p">|</span> <span class="s">'sales'</span>        <span class="c">// sales figures refreshed</span>
+  <span class="p">|</span> <span class="s">'social'</span>       <span class="c">// social snapshot updated</span>
+  <span class="p">|</span> <span class="s">'venue'</span>        <span class="c">// venue incident or flag</span>
+  <span class="p">|</span> <span class="s">'member'</span>       <span class="c">// member risk or status change</span>
+  <span class="p">|</span> <span class="s">'schedule'</span>     <span class="c">// event upcoming or completed</span>
+  <span class="p">|</span> <span class="s">'milestone'</span><span class="p">;</span>   <span class="c">// 100M streams, platinum cert, etc.</span>
+
+<span class="k">type</span> <span class="t">WorldEventTone</span> <span class="p">=</span>
+  <span class="s">'positive'</span> <span class="p">|</span> <span class="s">'negative'</span> <span class="p">|</span> <span class="s">'neutral'</span> <span class="p">|</span> <span class="s">'warning'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">WorldEvent</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>              <span class="t">string</span><span class="p">;</span>
+  <span class="key">gameDate</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>          <span class="c">// in-game date this fired (ISO 8601)</span>
+  <span class="key">category</span><span class="p">:</span>        <span class="t">WorldEventCategory</span><span class="p">;</span>
+  <span class="key">tone</span><span class="p">:</span>            <span class="t">WorldEventTone</span><span class="p">;</span>
+  <span class="key">message</span><span class="p">:</span>         <span class="t">string</span><span class="p">;</span>          <span class="c">// plain language ticker text</span>
+  <span class="key">bandId</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">memberId</span><span class="p">?:</span>       <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>
+  <span class="key">venueId</span><span class="p">?:</span>        <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>
+  <span class="key">releaseId</span><span class="p">?:</span>      <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>
+  <span class="key">incidentId</span><span class="p">?:</span>     <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>   <span class="c">// if this event spawned an incident</span>
+  <span class="key">spawnsInbox</span><span class="p">:</span>     <span class="t">boolean</span><span class="p">;</span>         <span class="c">// true if a decision is required</span>
+  <span class="key">inboxMessageId</span><span class="p">?:</span> <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>   <span class="c">// link to spawned InboxMessage</span>
+  <span class="key">createdAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="wevent-json" class="tab-content">
+        <pre>
+<span class="p">[</span>
+  <span class="p">{</span>
+    <span class="key">"id"</span><span class="p">:</span>             <span class="s">"wev_0041"</span><span class="p">,</span>
+    <span class="key">"gameDate"</span><span class="p">:</span>       <span class="s">"2026-03-14"</span><span class="p">,</span>
+    <span class="key">"category"</span><span class="p">:</span>       <span class="s">"chart"</span><span class="p">,</span>
+    <span class="key">"tone"</span><span class="p">:</span>           <span class="s">"positive"</span><span class="p">,</span>
+    <span class="key">"message"</span><span class="p">:</span>        <span class="s">"SUPERNOVA climbed 3 spots on Melon Daily — now at #4"</span><span class="p">,</span>
+    <span class="key">"bandId"</span><span class="p">:</span>         <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+    <span class="key">"releaseId"</span><span class="p">:</span>      <span class="s">"rel_004"</span><span class="p">,</span>
+    <span class="key">"spawnsInbox"</span><span class="p">:</span>    <span class="n">false</span><span class="p">,</span>
+    <span class="key">"createdAt"</span><span class="p">:</span>      <span class="s">"2026-03-14T00:00:01Z"</span>
+  <span class="p">}</span><span class="p">,</span>
+  <span class="p">{</span>
+    <span class="key">"id"</span><span class="p">:</span>             <span class="s">"wev_0042"</span><span class="p">,</span>
+    <span class="key">"gameDate"</span><span class="p">:</span>       <span class="s">"2026-03-14"</span><span class="p">,</span>
+    <span class="key">"category"</span><span class="p">:</span>       <span class="s">"venue"</span><span class="p">,</span>
+    <span class="key">"tone"</span><span class="p">:</span>           <span class="s">"warning"</span><span class="p">,</span>
+    <span class="key">"message"</span><span class="p">:</span>        <span class="s">"Weather advisory issued for Seoul — venue check triggered for tonight's show"</span><span class="p">,</span>
+    <span class="key">"bandId"</span><span class="p">:</span>         <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+    <span class="key">"venueId"</span><span class="p">:</span>        <span class="s">"venue_041"</span><span class="p">,</span>
+    <span class="key">"incidentId"</span><span class="p">:</span>     <span class="s">"inc_020"</span><span class="p">,</span>
+    <span class="key">"spawnsInbox"</span><span class="p">:</span>    <span class="n">true</span><span class="p">,</span>
+    <span class="key">"inboxMessageId"</span><span class="p">:</span> <span class="s">"msg_018"</span><span class="p">,</span>
+    <span class="key">"createdAt"</span><span class="p">:</span>      <span class="s">"2026-03-14T00:00:02Z"</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ INBOX MESSAGE ═══ -->
+  <section class="section" id="inbox-message">
+    <div class="section-label">Game Layer · Inbox</div>
+    <h2>Inbox Message</h2>
+    <p>A message requiring a player decision. Spawned either by a WorldEvent (e.g. a venue incident that needs a call) or by a member/label contact reaching out directly. Each message has a set of response options — the player picks one, and the outcome is applied to the relevant entities. Unanswered messages can expire or escalate.</p>
+
+    <div class="relations">
+      <span class="relation-tag">WorldEvent (optional)</span>
+      <span class="relation-tag">Member (optional sender)</span>
+      <span class="relation-tag">Venue (optional)</span>
+      <span class="relation-tag">ScheduleEvent (optional)</span>
+      <span class="relation-tag">GameState</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'inbox-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'inbox-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="inbox-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">InboxSender</span> <span class="p">=</span>
+  <span class="p">|</span> <span class="s">'member'</span>
+  <span class="p">|</span> <span class="s">'label'</span>
+  <span class="p">|</span> <span class="s">'promoter'</span>
+  <span class="p">|</span> <span class="s">'venue'</span>
+  <span class="p">|</span> <span class="s">'pr_team'</span>
+  <span class="p">|</span> <span class="s">'system'</span><span class="p">;</span>   <span class="c">// generated by game engine, no human sender</span>
+
+<span class="k">type</span> <span class="t">MessageStatus</span> <span class="p">=</span>
+  <span class="s">'unread'</span> <span class="p">|</span> <span class="s">'read'</span> <span class="p">|</span> <span class="s">'responded'</span> <span class="p">|</span> <span class="s">'expired'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">ResponseOption</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>          <span class="t">string</span><span class="p">;</span>
+  <span class="key">label</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>        <span class="c">// button text shown to player</span>
+  <span class="key">outcome</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>        <span class="c">// plain description of what happens</span>
+  <span class="key">effects</span><span class="p">:</span>     <span class="t">GameEffect</span><span class="p">[];</span>  <span class="c">// applied to entities on selection</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="fn">GameEffect</span> <span class="p">{</span>
+  <span class="key">entity</span><span class="p">:</span>    <span class="s">'member'</span> <span class="p">|</span> <span class="s">'scheduleEvent'</span> <span class="p">|</span> <span class="s">'contract'</span> <span class="p">|</span> <span class="s">'venue'</span><span class="p">;</span>
+  <span class="key">entityId</span><span class="p">:</span>  <span class="t">string</span><span class="p">;</span>
+  <span class="key">field</span><span class="p">:</span>     <span class="t">string</span><span class="p">;</span>   <span class="c">// e.g. "status", "wellbeingScore"</span>
+  <span class="key">value</span><span class="p">:</span>     <span class="t">unknown</span><span class="p">;</span>  <span class="c">// the new value to apply</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="fn">InboxMessage</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>              <span class="t">string</span><span class="p">;</span>
+  <span class="key">gameDate</span><span class="p">:</span>        <span class="t">string</span><span class="p">;</span>
+  <span class="key">senderType</span><span class="p">:</span>      <span class="t">InboxSender</span><span class="p">;</span>
+  <span class="key">senderName</span><span class="p">:</span>      <span class="t">string</span><span class="p">;</span>          <span class="c">// display name, e.g. "RION" or "Stellar Label"</span>
+  <span class="key">senderId</span><span class="p">?:</span>       <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>   <span class="c">// memberId, venueId, etc.</span>
+  <span class="key">subject</span><span class="p">:</span>         <span class="t">string</span><span class="p">;</span>
+  <span class="key">body</span><span class="p">:</span>            <span class="t">string</span><span class="p">;</span>
+  <span class="key">status</span><span class="p">:</span>          <span class="t">MessageStatus</span><span class="p">;</span>
+  <span class="key">responseOptions</span><span class="p">:</span> <span class="t">ResponseOption</span><span class="p">[];</span>
+  <span class="key">chosenResponseId</span><span class="p">?:</span> <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>
+  <span class="key">expiresOnDate</span><span class="p">?:</span>  <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>   <span class="c">// auto-expires if player ignores it</span>
+  <span class="key">worldEventId</span><span class="p">?:</span>   <span class="t">string</span> <span class="p">|</span> <span class="k">null</span><span class="p">;</span>   <span class="c">// the WorldEvent that spawned this</span>
+  <span class="key">createdAt</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="inbox-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>              <span class="s">"msg_018"</span><span class="p">,</span>
+  <span class="key">"gameDate"</span><span class="p">:</span>        <span class="s">"2026-03-14"</span><span class="p">,</span>
+  <span class="key">"senderType"</span><span class="p">:</span>      <span class="s">"venue"</span><span class="p">,</span>
+  <span class="key">"senderName"</span><span class="p">:</span>      <span class="s">"Seoul Olympic Gymnastics Arena"</span><span class="p">,</span>
+  <span class="key">"senderId"</span><span class="p">:</span>        <span class="s">"venue_041"</span><span class="p">,</span>
+  <span class="key">"subject"</span><span class="p">:</span>         <span class="s">"Weather advisory — tonight's show at risk"</span><span class="p">,</span>
+  <span class="key">"body"</span><span class="p">:</span>            <span class="s">"A severe weather advisory has been issued for Seoul tonight. We need your decision by 4PM on whether to proceed, postpone, or cancel. Crowd safety is our priority."</span><span class="p">,</span>
+  <span class="key">"status"</span><span class="p">:</span>          <span class="s">"unread"</span><span class="p">,</span>
+  <span class="key">"expiresOnDate"</span><span class="p">:</span>   <span class="s">"2026-03-14"</span><span class="p">,</span>
+  <span class="key">"worldEventId"</span><span class="p">:</span>    <span class="s">"wev_0042"</span><span class="p">,</span>
+  <span class="key">"responseOptions"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="key">"id"</span><span class="p">:</span>      <span class="s">"opt_a"</span><span class="p">,</span>
+      <span class="key">"label"</span><span class="p">:</span>   <span class="s">"Proceed as planned"</span><span class="p">,</span>
+      <span class="key">"outcome"</span><span class="p">:</span> <span class="s">"Show goes ahead. Risk of incident elevated."</span><span class="p">,</span>
+      <span class="key">"effects"</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="key">"entity"</span><span class="p">:</span>   <span class="s">"scheduleEvent"</span><span class="p">,</span>
+        <span class="key">"entityId"</span><span class="p">:</span> <span class="s">"evt_0388"</span><span class="p">,</span>
+        <span class="key">"field"</span><span class="p">:</span>    <span class="s">"status"</span><span class="p">,</span>
+        <span class="key">"value"</span><span class="p">:</span>    <span class="s">"confirmed"</span>
+      <span class="p">}]</span>
+    <span class="p">}</span><span class="p">,</span>
+    <span class="p">{</span>
+      <span class="key">"id"</span><span class="p">:</span>      <span class="s">"opt_b"</span><span class="p">,</span>
+      <span class="key">"label"</span><span class="p">:</span>   <span class="s">"Postpone to next available date"</span><span class="p">,</span>
+      <span class="key">"outcome"</span><span class="p">:</span> <span class="s">"Show postponed. Fans notified. Revenue delayed."</span><span class="p">,</span>
+      <span class="key">"effects"</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="key">"entity"</span><span class="p">:</span>   <span class="s">"scheduleEvent"</span><span class="p">,</span>
+        <span class="key">"entityId"</span><span class="p">:</span> <span class="s">"evt_0388"</span><span class="p">,</span>
+        <span class="key">"field"</span><span class="p">:</span>    <span class="s">"status"</span><span class="p">,</span>
+        <span class="key">"value"</span><span class="p">:</span>    <span class="s">"postponed"</span>
+      <span class="p">}]</span>
+    <span class="p">}</span>
+  <span class="p">]</span><span class="p">,</span>
+  <span class="key">"chosenResponseId"</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>        <span class="s">"2026-03-14T00:00:02Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ GAME STATE ═══ -->
+  <section class="section" id="game-state">
+    <div class="section-label">Game Layer · Engine</div>
+    <h2>Game State</h2>
+    <p>The top-level record of where the player is in the game. Tracks the current in-game date, the default time increment, and summary counters. One GameState exists per save. Advancing time updates <code>currentDate</code>, resolves scheduled world events, runs member incident probability checks, and appends to the WorldEvent log.</p>
+
+    <div class="relations">
+      <span class="relation-tag">Band</span>
+      <span class="relation-tag">WorldEvent[]</span>
+      <span class="relation-tag">InboxMessage[]</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(this, 'gamestate-ts')">TypeScript</button>
+      <button class="tab-btn" onclick="switchTab(this, 'gamestate-json')">JSON Sample</button>
+    </div>
+    <div class="code-block">
+      <div id="gamestate-ts" class="tab-content active">
+        <pre>
+<span class="k">type</span> <span class="t">TimeIncrement</span> <span class="p">=</span> <span class="s">'day'</span> <span class="p">|</span> <span class="s">'week'</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="fn">GameState</span> <span class="p">{</span>
+  <span class="key">id</span><span class="p">:</span>                <span class="t">string</span><span class="p">;</span>
+  <span class="key">bandId</span><span class="p">:</span>            <span class="t">string</span><span class="p">;</span>
+  <span class="key">currentDate</span><span class="p">:</span>       <span class="t">string</span><span class="p">;</span>         <span class="c">// in-game date (ISO 8601)</span>
+  <span class="key">startDate</span><span class="p">:</span>         <span class="t">string</span><span class="p">;</span>         <span class="c">// band's debut date — game start</span>
+  <span class="key">timeIncrement</span><span class="p">:</span>     <span class="t">TimeIncrement</span><span class="p">;</span>  <span class="c">// player's preferred advance unit</span>
+  <span class="key">unreadInboxCount</span><span class="p">:</span>  <span class="t">number</span><span class="p">;</span>
+  <span class="key">openIncidentCount</span><span class="p">:</span> <span class="t">number</span><span class="p">;</span>
+  <span class="key">atRiskEventCount</span><span class="p">:</span>  <span class="t">number</span><span class="p">;</span>
+  <span class="key">lastAdvancedAt</span><span class="p">:</span>    <span class="t">string</span><span class="p">;</span>         <span class="c">// real-world timestamp</span>
+  <span class="key">createdAt</span><span class="p">:</span>         <span class="t">string</span><span class="p">;</span>
+  <span class="key">updatedAt</span><span class="p">:</span>         <span class="t">string</span><span class="p">;</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+      <div id="gamestate-json" class="tab-content">
+        <pre>
+<span class="p">{</span>
+  <span class="key">"id"</span><span class="p">:</span>                <span class="s">"save_001"</span><span class="p">,</span>
+  <span class="key">"bandId"</span><span class="p">:</span>            <span class="s">"band_01HX9K2M"</span><span class="p">,</span>
+  <span class="key">"currentDate"</span><span class="p">:</span>       <span class="s">"2026-03-14"</span><span class="p">,</span>
+  <span class="key">"startDate"</span><span class="p">:</span>         <span class="s">"2022-03-14"</span><span class="p">,</span>
+  <span class="key">"timeIncrement"</span><span class="p">:</span>     <span class="s">"day"</span><span class="p">,</span>
+  <span class="key">"unreadInboxCount"</span><span class="p">:</span>  <span class="n">2</span><span class="p">,</span>
+  <span class="key">"openIncidentCount"</span><span class="p">:</span> <span class="n">1</span><span class="p">,</span>
+  <span class="key">"atRiskEventCount"</span><span class="p">:</span>  <span class="n">2</span><span class="p">,</span>
+  <span class="key">"lastAdvancedAt"</span><span class="p">:</span>    <span class="s">"2026-05-30T10:07:00Z"</span><span class="p">,</span>
+  <span class="key">"createdAt"</span><span class="p">:</span>         <span class="s">"2026-01-01T00:00:00Z"</span><span class="p">,</span>
+  <span class="key">"updatedAt"</span><span class="p">:</span>         <span class="s">"2026-05-30T10:07:00Z"</span>
+<span class="p">}</span>
+        </pre>
+      </div>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠️</span>
+      <p><strong>Advance Time flow:</strong> When the player advances, the engine (1) increments <code>currentDate</code>, (2) resolves all deterministic scheduled events for that date, (3) runs probabilistic member incident checks, (4) appends <code>WorldEvent</code> entries to the ticker, (5) spawns any required <code>InboxMessage</code> records, and (6) updates <code>GameState</code> counters. The player sees the ticker update before they can act.</p>
+    </div>
+  </section>
+
+<script>
+  // ── Tab switching ──
+  function switchTab(btn, contentId) {
+    const tabGroup = btn.closest('.tabs');
+    tabGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const codeBlock = tabGroup.nextElementSibling;
+    codeBlock.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const target = document.getElementById(contentId);
+    if (target) target.classList.add('active');
+  }
+
+  // ── Mobile drawer ──
+  function openDrawer() {
+    document.getElementById('mobileDrawer').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    document.getElementById('mobileDrawer').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close drawer on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeDrawer();
+  });
+
+  // ── Inject data-label attrs on field tables for mobile stacking ──
+  document.querySelectorAll('.field-table').forEach(table => {
+    const headers = [...table.querySelectorAll('th')].map(th => th.textContent.trim());
+    table.querySelectorAll('tbody tr').forEach(row => {
+      [...row.querySelectorAll('td')].forEach((td, i) => {
+        if (headers[i]) td.setAttribute('data-label', headers[i]);
+      });
+    });
+  });
+
+  // ── Active nav highlight on scroll ──
+  const sections = document.querySelectorAll('.section[id], .page-header[id]');
+  const navLinks = document.querySelectorAll('nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { threshold: 0.2 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</div>
+</body>
+</html>
+kpop-admin-data-model.html
+Displaying kpop-admin-data-model.html.
